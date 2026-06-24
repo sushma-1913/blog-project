@@ -1,33 +1,80 @@
 body{
     font-family: Arial, sans-serif;
-    background:#f4f4f4;
-    margin:0;
-    padding:20px;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard{
+    width: 400px;
+    background: white;
+    margin: 80px auto;
+    padding: 30px;
+    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+}
+
+.dashboard h1{
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.welcome,
+.role{
+    color: #555;
+    font-size: 18px;
+}
+
+.buttons{
+    margin-top: 25px;
+}
+
+.btn{
+    display: block;
+    margin: 15px 0;
+    padding: 14px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn:hover{
+    background: #0056b3;
+    transform: translateY(-3px);
+}
+
+.logout{
+    background: #dc3545;
+}
+
+.logout:hover{
+    background: #b02a37;
 }
 
 .container{
-    width:80%;
-    margin:auto;
+    width: 80%;
+    margin: auto;
 }
 
 .post{
-    background:white;
-    padding:15px;
-    margin-bottom:15px;
-    border-radius:8px;
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
 }
 
-input, textarea{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
+input,
+textarea{
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
 }
 
 button{
-    padding:10px 15px;
-    cursor:pointer;
-}
-
-a{
-    text-decoration:none;
+    padding: 10px 15px;
+    cursor: pointer;
 }
