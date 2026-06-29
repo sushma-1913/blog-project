@@ -12,11 +12,16 @@ $limit = 5;
 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
+if($page < 1)
+{
+    $page = 1;
+}
+
 $start = ($page - 1) * $limit;
 
 if(isset($_GET['search']) && $_GET['search'] != "")
 {
-    $search = $_GET['search'];
+    $search = mysqli_real_escape_string($conn,$_GET['search']);
 
     $result = mysqli_query($conn,
     "SELECT * FROM posts
@@ -31,108 +36,219 @@ else
     ORDER BY id DESC
     LIMIT $start,$limit");
 }
+
+$total_query = mysqli_query($conn,
+"SELECT COUNT(*) AS total FROM posts");
+
+$total_row = mysqli_fetch_assoc($total_query);
+
+$total_pages = ceil($total_row['total'] / $limit);
+
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <title>Blog Posts</title>
-<link rel="stylesheet"
-href="assets/css/style.css">
-<style>
 
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f4f4;
-    padding:20px;
-}
-
-.post{
-    background:white;
-    padding:15px;
-    margin-bottom:15px;
-    border-radius:8px;
-}
-
-input{
-    padding:8px;
-}
-
-button{
-    padding:8px 12px;
-}
-
-</style>
+<link rel="stylesheet" href="assets/css/style.css">
 
 </head>
 
 <body>
 
-<h2>Welcome <?php echo $_SESSION['user']; ?></h2>
+<div class="navbar">
+
+<div class="logo">
+
+📝 Blog Management System
+
+</div>
+
+<div class="nav-links">
+
+<a href="dashboard.php">Dashboard</a>
 
 <a href="create.php">Create Post</a>
-|
+
+<?php
+if($_SESSION['role']=="admin")
+{
+?>
+
+<a href="admin.php">Admin</a>
+
+<?php
+}
+?>
+
 <a href="logout.php">Logout</a>
 
-<hr>
+</div>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h1>All Blog Posts</h1>
+
+<p>
+
+Welcome,
+
+<strong>
+
+<?php echo $_SESSION['user']; ?>
+
+</strong>
+
+</p>
+
+</div>
+
+<br>
 
 <form method="GET">
+
+<div class="search-box">
 
 <input
 type="text"
 name="search"
-placeholder="Search posts">
+placeholder="Search by title or content..."
+value="<?php if(isset($_GET['search'])) echo htmlspecialchars($_GET['search']); ?>">
 
-<button type="submit">
-Search
+<button
+class="btn btn-primary"
+type="submit">
+
+🔍 Search
+
 </button>
+
+</div>
 
 </form>
 
 <br>
 
-<?php while($row=mysqli_fetch_assoc($result)) { ?>
+<?php
+
+if(mysqli_num_rows($result)>0)
+{
+
+while($row=mysqli_fetch_assoc($result))
+{
+
+?>
 
 <div class="post">
 
-<h3><?php echo $row['title']; ?></h3>
+<h2>
 
-<p><?php echo $row['content']; ?></p>
+<?php echo htmlspecialchars($row['title']); ?>
 
-<a href="edit.php?id=<?php echo $row['id']; ?>">
-Edit
-</a>
+</h2>
 
-|
+<br>
 
-<a href="delete.php?id=<?php echo $row['id']; ?>">
-Delete
-</a>
-
-</div>
-
-<?php } ?>
-
-<hr>
+<p>
 
 <?php
 
-$total_query =
-mysqli_query($conn,
-"SELECT COUNT(*) as total FROM posts");
+echo nl2br(htmlspecialchars($row['content']));
 
-$total_row =
-mysqli_fetch_assoc($total_query);
+?>
 
-$total_pages =
-ceil($total_row['total'] / $limit);
+</p>
 
-for($i=1;$i<=$total_pages;$i++)
+<br>
+
+<a
+class="btn btn-warning"
+href="edit.php?id=<?php echo $row['id']; ?>">
+
+✏ Edit
+
+</a>
+
+<?php
+
+if($_SESSION['role']=="admin")
 {
-    echo "<a href='?page=$i'>$i</a> ";
+
+?>
+
+<a
+class="btn btn-danger"
+href="delete.php?id=<?php echo $row['id']; ?>"
+onclick="return confirm('Delete this post?');">
+
+🗑 Delete
+
+</a>
+
+<?php
+
 }
 
 ?>
 
+</div>
+
+<?php
+
+}
+
+}
+
+else
+
+{
+
+?>
+
+<div class="card">
+
+<h3>No Posts Found.</h3>
+
+</div>
+
+<?php
+
+}
+
+?>
+
+<div class="pagination">
+
+<?php
+
+for($i=1;$i<=$total_pages;$i++)
+{
+
+echo "<a href='?page=$i'>$i</a>";
+
+}
+
+?>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+© <?php echo date("Y"); ?>
+
+Blog Management System
+
+</div>
+
 </body>
+
 </html>

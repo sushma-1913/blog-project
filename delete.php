@@ -1,17 +1,15 @@
 <?php
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 session_start();
 include 'config.php';
 
 if(!isset($_SESSION['user']))
 {
-    die("Please Login First");
+    header("Location: login.php");
+    exit();
 }
 
-if($_SESSION['role'] != 'admin')
+// Only Admin Can Delete
+if($_SESSION['role'] != "admin")
 {
     die("Access Denied! Only Admin can delete posts.");
 }
@@ -21,33 +19,29 @@ if(isset($_GET['id']))
     $id = (int)$_GET['id'];
 
     $stmt = mysqli_prepare(
-        $conn,
-        "DELETE FROM posts WHERE id=?"
+    $conn,
+    "DELETE FROM posts WHERE id=?"
     );
 
-    if(!$stmt)
-    {
-        die("Prepare Failed: " . mysqli_error($conn));
-    }
-
     mysqli_stmt_bind_param(
-        $stmt,
-        "i",
-        $id
+    $stmt,
+    "i",
+    $id
     );
 
     if(mysqli_stmt_execute($stmt))
     {
-        echo "Post Deleted Successfully";
+        header("Location: index.php?msg=deleted");
+        exit();
     }
     else
     {
-        echo "Delete Failed";
+        echo "Failed to delete post.";
     }
 }
 else
 {
-    echo "No ID Received";
+    header("Location: index.php");
+    exit();
 }
-
 ?>

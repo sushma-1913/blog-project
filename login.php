@@ -11,30 +11,30 @@ if(isset($_POST['login']))
 
     if(empty($username) || empty($password))
     {
-        $message = "All fields are required";
+        $message = "All fields are required!";
     }
     else
     {
         $stmt = mysqli_prepare(
-            $conn,
-            "SELECT * FROM users WHERE username=?"
+        $conn,
+        "SELECT * FROM users WHERE username=?"
         );
 
         mysqli_stmt_bind_param(
-            $stmt,
-            "s",
-            $username
+        $stmt,
+        "s",
+        $username
         );
 
         mysqli_stmt_execute($stmt);
 
         $result = mysqli_stmt_get_result($stmt);
 
-        if(mysqli_num_rows($result) == 1)
+        if(mysqli_num_rows($result)==1)
         {
             $user = mysqli_fetch_assoc($result);
 
-            if(password_verify($password, $user['password']))
+            if(password_verify($password,$user['password']))
             {
                 $_SESSION['user'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
@@ -44,12 +44,12 @@ if(isset($_POST['login']))
             }
             else
             {
-                $message = "Wrong Password";
+                $message = "Incorrect Password!";
             }
         }
         else
         {
-            $message = "User Not Found";
+            $message = "Username not found!";
         }
     }
 }
@@ -57,91 +57,136 @@ if(isset($_POST['login']))
 
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Login</title>
 
-    <style>
-    body{
-        font-family: Arial, sans-serif;
-        background:#f4f6f9;
-        margin:0;
-        padding:0;
-    }
+<title>Login</title>
 
-    .login-box{
-        width:400px;
-        background:white;
-        margin:100px auto;
-        padding:30px;
-        border-radius:15px;
-        box-shadow:0px 0px 20px rgba(0,0,0,0.2);
-    }
-
-    h2{
-        text-align:center;
-    }
-
-    input{
-        width:100%;
-        padding:12px;
-        margin-top:5px;
-        margin-bottom:15px;
-        box-sizing:border-box;
-    }
-
-    button{
-        width:100%;
-        padding:12px;
-        background:#007bff;
-        color:white;
-        border:none;
-        border-radius:8px;
-        cursor:pointer;
-    }
-
-    button:hover{
-        background:#0056b3;
-    }
-
-    .message{
-        text-align:center;
-        color:red;
-    }
-
-    .link{
-        text-align:center;
-        margin-top:15px;
-    }
-    </style>
+<link rel="stylesheet"
+href="assets/css/style.css">
 
 </head>
+
 <body>
 
-<div class="login-box">
+<div class="navbar">
 
-    <h2>Login</h2>
+<div class="logo">
 
-    <form method="POST">
+📝 Blog Management System
 
-        Username:
-        <input type="text" name="username" required>
+</div>
 
-        Password:
-        <input type="password" name="password" required>
+<div class="nav-links">
 
-        <button type="submit" name="login">
-            Login
-        </button>
+<a href="register.php">
 
-    </form>
+Register
 
-    <p class="message"><?php echo $message; ?></p>
+</a>
 
-    <div class="link">
-        <a href="register.php">Register Here</a>
-    </div>
+</div>
+
+</div>
+
+<div class="auth-box">
+
+<h2>
+
+Welcome Back 👋
+
+</h2>
+
+<p style="text-align:center;color:gray;">
+
+Login to continue
+
+</p>
+
+<br>
+
+<form method="POST">
+
+<label>
+
+Username
+
+</label>
+
+<input
+type="text"
+name="username"
+placeholder="Enter Username"
+required>
+
+<label>
+
+Password
+
+</label>
+
+<input
+type="password"
+name="password"
+placeholder="Enter Password"
+required>
+
+<button
+class="btn btn-primary"
+type="submit"
+name="login">
+
+🔑 Login
+
+</button>
+
+</form>
+
+<?php
+
+if($message!="")
+{
+
+?>
+
+<p class="message">
+
+<?php echo $message; ?>
+
+</p>
+
+<?php
+
+}
+
+?>
+
+<div style="text-align:center;margin-top:20px;">
+
+Don't have an account?
+
+<br><br>
+
+<a
+class="btn btn-success"
+href="register.php">
+
+📝 Register
+
+</a>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+© <?php echo date("Y"); ?>
+
+Blog Management System
 
 </div>
 
 </body>
+
 </html>

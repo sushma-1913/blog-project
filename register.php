@@ -7,40 +7,66 @@ if(isset($_POST['register']))
 {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
+    $role = "editor";
 
     if(empty($username) || empty($password))
     {
-        $message = "All fields are required";
+        $message = "All fields are required!";
     }
     elseif(strlen($password) < 6)
     {
-        $message = "Password must be at least 6 characters";
+        $message = "Password must be at least 6 characters!";
     }
     else
     {
-        $hashedPassword =
-        password_hash($password, PASSWORD_DEFAULT);
-
-        $stmt = mysqli_prepare(
-        $conn,
-        "INSERT INTO users(username,password)
-        VALUES(?,?)"
+        $check = mysqli_prepare(
+            $conn,
+            "SELECT id FROM users WHERE username=?"
         );
 
         mysqli_stmt_bind_param(
-        $stmt,
-        "ss",
-        $username,
-        $hashedPassword
+            $check,
+            "s",
+            $username
         );
 
-        if(mysqli_stmt_execute($stmt))
+        mysqli_stmt_execute($check);
+
+        $result = mysqli_stmt_get_result($check);
+
+        if(mysqli_num_rows($result) > 0)
         {
-            $message = "Registration Successful!";
+            $message = "Username already exists!";
         }
         else
         {
-            $message = "Error!";
+            $hashedPassword = password_hash(
+                $password,
+                PASSWORD_DEFAULT
+            );
+
+            $stmt = mysqli_prepare(
+                $conn,
+                "INSERT INTO users(username,password,role)
+                VALUES(?,?,?)"
+            );
+
+            mysqli_stmt_bind_param(
+                $stmt,
+                "sss",
+                $username,
+                $hashedPassword,
+                $role
+            );
+
+            if(mysqli_stmt_execute($stmt))
+            {
+                $message = "Registration Successful!";
+            }
+            else
+            {
+                $message = "Registration Failed!";
+            }
         }
     }
 }
@@ -48,33 +74,137 @@ if(isset($_POST['register']))
 
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Register</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Register</title>
+
+<link
+rel="stylesheet"
+href="assets/css/style.css">
+
 </head>
+
 <body>
 
-<h2>User Registration</h2>
+<nav class="navbar">
+
+<div class="logo">
+
+📝 Blog Management System
+
+</div>
+
+<div class="nav-links">
+
+<a href="login.php">
+
+Login
+
+</a>
+
+</div>
+
+</nav>
+
+<div class="auth-box">
+
+<h2>Create Account</h2>
+
+<p class="subtitle">
+
+Create your account to continue.
+
+</p>
 
 <form method="POST">
 
-    Username:
-    <input type="text" name="username" required>
-    <br><br>
+<label>
 
-    Password:
-    <input type="password" name="password" required>
-    <br><br>
+Username
 
-    <button type="submit" name="register">
-        Register
-    </button>
+</label>
+
+<input
+type="text"
+name="username"
+placeholder="Enter Username"
+required>
+
+<label>
+
+Password
+
+</label>
+
+<input
+type="password"
+name="password"
+placeholder="Enter Password"
+required>
+
+<button
+type="submit"
+name="register"
+class="btn btn-success">
+
+📝 Register
+
+</button>
 
 </form>
 
-<p><?php echo $message; ?></p>
+<?php
 
-<a href="login.php">Login Here</a>
+if($message!="")
+{
+
+?>
+
+<p class="message">
+
+<?php echo $message; ?>
+
+</p>
+
+<?php
+
+}
+
+?>
+
+<div class="bottom-link">
+
+Already have an account?
+
+<br><br>
+
+<a
+href="login.php"
+class="btn btn-primary">
+
+🔑 Login
+
+</a>
+
+</div>
+
+</div>
+
+<footer class="footer">
+
+© <?php echo date("Y"); ?>
+
+Blog Management System
+
+</footer>
 
 </body>
+
 </html>
